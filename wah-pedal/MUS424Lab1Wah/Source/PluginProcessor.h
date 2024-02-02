@@ -46,11 +46,24 @@ typedef struct {            //Biquad Struct
         // with az0 normalized to 1.0.
         
         //Default coefficients set to bypass (impulse response h(n) = 1, 0, 0, 0,.....
-        double bz0=1.0;
-        double bz1=0.0;
-        double bz2=0.0;
-        double az1=0.0;
-        double az2=0.0;
+        
+        // TODO: set Td appropriately based on warp frequency
+        double Td = 1 / samplingRate;
+        
+        double az0 = 4 * a[0] / pow(Td, 2) + 2 * a[1] / Td + a[2];
+        
+        double bz0 = 2 * b[1] / Td;
+        double bz1 = 0.0;
+        double bz2 = -2 * b[1] / Td;
+        double az1 = - 8 * a[0] / pow(Td, 2) + 2 * a[2];
+        double az2 = 4 * a[0] / pow(Td, 2) - 2 * a[1] / Td + a[2];
+        
+        // normalize
+        bz0 /= az0;
+        bz1 /= az0;
+        bz2 /= az0;
+        az1 /= az0;
+        az2 /= az0;
 
         targetCofs[0]=bz0; targetCofs[1]=bz1; targetCofs[2]=bz2; targetCofs[3]=az1; targetCofs[4]=az2;
     }
@@ -108,6 +121,8 @@ typedef struct {            //Biquad Struct
         
         // Defaults to an arbitrary smoothing time:
         smoothingFactor=4.535137108518938e-06;
+        
+
     }
 } DirectBiquad;
 
@@ -172,8 +187,8 @@ private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MUS424Lab1WahAudioProcessor)
     
-    const double kQ[11]={10.0, 10.0, 10.0, 10.0, 7.943, 5.623, 4.217, 3.802, 2.985, 2.630, 2.291};
-    const double kWc[11]={2513.3, 2513.3, 2513.3, 2513.3, 3078.8, 4121.8, 6157.5, 7376.5, 8928.4, 10687.7, 12208.2};
-    const double kGamma[11]={6.309, 6.309, 6.309, 6.309, 7.729, 10.348, 15.458, 18.518, 22.415,  26.831, 30.649};
+//    const double kQ[11]={10.0, 10.0, 10.0, 10.0, 7.943, 5.623, 4.217, 3.802, 2.985, 2.630, 2.291};
+//    const double kWc[11]={2513.3, 2513.3, 2513.3, 2513.3, 3078.8, 4121.8, 6157.5, 7376.5, 8928.4, 10687.7, 12208.2};
+//    const double kGamma[11]={6.309, 6.309, 6.309, 6.309, 7.729, 10.348, 15.458, 18.518, 22.415,  26.831, 30.649};
     
 };

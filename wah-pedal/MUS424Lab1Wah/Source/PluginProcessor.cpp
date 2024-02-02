@@ -280,7 +280,7 @@ void MUS424Lab1WahAudioProcessor::DesignWahFilter(double position)
     double Q = Qs[index] * (1 - frac) + Qs[index + 1] * frac;
 
     // Convert these parameters to filter coefficients
-    double w0 = 2 * M_PI * f0 / getSampleRate();
+    double w0 = 2 * kPi * f0; //  units of f0? "/ getSampleRate();" ?
     
     //
     //               gamma*s/w0
@@ -291,9 +291,9 @@ void MUS424Lab1WahAudioProcessor::DesignWahFilter(double position)
     b0 = 0;
     b1 = gamma/w0;
     b2 = 0;
-    a0 = 1/(w0*w0);
+    a0 = 1;
     a1 = 1/(w0*Q);
-    a2 = 1;
+    a2 = 1/(w0*w0);
 
     wahFilter.b[0]=b2; wahFilter.b[1]=b1; wahFilter.b[2]=b0;
     wahFilter.a[0]=a2; wahFilter.a[1]=a1; wahFilter.a[2]=a0;
