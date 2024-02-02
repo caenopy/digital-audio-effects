@@ -47,7 +47,8 @@ typedef struct {            //Biquad Struct
         
         //Default coefficients set to bypass (impulse response h(n) = 1, 0, 0, 0,.....
         
-        // TODO: set Td appropriately based on warp frequency
+        // We only use this function with warpfreq = 0, so it currently does not
+        // handle frequency warping. 
         double Td = 1 / samplingRate;
         
         double az0 = 4 * a[0] / pow(Td, 2) + 2 * a[1] / Td + a[2];
@@ -120,9 +121,7 @@ typedef struct {            //Biquad Struct
         // target coefficiencts each time SmoothCoefs() is called.
         
         // Defaults to an arbitrary smoothing time:
-        smoothingFactor=4.535137108518938e-06;
-        
-
+        smoothingFactor = exp( -1 / (smoothingTime * samplingRate));
     }
 } DirectBiquad;
 
