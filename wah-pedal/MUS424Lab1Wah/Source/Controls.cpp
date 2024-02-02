@@ -105,8 +105,8 @@ void Controls::sliderValueChanged (juce::Slider* sliderThatWasMoved)
         //[UserSliderCode_freq__slider] -- add your slider handling code here..
         float fval = freq__slider.get()->getValue();
         *pProcessor->freqParam = fval;
-        pProcessor->DesignResonantLPF(fval);    // Lab1_Task: uncomment DesignWahFilter and call instead of
-        //pProcessor->DesignWahFilter(fval);    // DesignResonantLPF once you have written DesignWahFilter.
+//        pProcessor->DesignResonantLPF(fval);    // Lab1_Task: uncomment DesignWahFilter and call instead of
+        pProcessor->DesignWahFilter(fval);    // DesignResonantLPF once you have written DesignWahFilter.
         //[/UserSliderCode_freq__slider]
     }
 

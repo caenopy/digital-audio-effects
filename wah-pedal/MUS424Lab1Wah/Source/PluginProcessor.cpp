@@ -22,7 +22,7 @@ MUS424Lab1WahAudioProcessor::MUS424Lab1WahAudioProcessor()
                        )
 #endif
 {
-    addParameter(freqParam         = new juce::AudioParameterFloat ("frequency", "Frequency", 0.0f, 1.0f, 0.5f));
+    addParameter(freqParam = new juce::AudioParameterFloat (juce::ParameterID{"frequency", 1}, "Frequency", 0.0f, 1.0f, 0.5f));
     
 }
 
@@ -258,13 +258,43 @@ void MUS424Lab1WahAudioProcessor::DesignWahFilter(double position)
 
     // Default: Design bypass filter with h(n) = 1.0, 0.0, 0.0, ....
     double b0,b1,b2,a0,a1,a2;
-    b2=0.0;
-    b1=0.0;
-    b0=1.0;
-    a2=0.0;
-    a1=0.0;
-    a0=1.0;
+//    b2=0.0;
+//    b1=0.0;
+//    b0=1.0;
+//    a2=0.0;
+//    a1=0.0;
+//    a0=1.0;
     
+    // Arrays for filter parameters for each pedal position (0 to 10)
+    const int numPositions = 11;
+    double gammas[numPositions] = { 0.15, 0.15, 0.15, 0.18, 0.19, 0.28, 0.42, 0.55, 0.63, 0.74, 0.87 };
+    double f0s[numPositions] =    { 400,   400,  400,  405,  500,  650, 1010, 1200, 1450, 1750, 2000 };
+    double Qs[numPositions] =     { 15.0, 15.0, 15.0, 11.0,  10.0,  7.0, 5.0,  4.0, 3.5,  3.0,  2.6 };
+    
+    // Interpolate the filter parameters based on position
+    int index = static_cast<int>(position * (numPositions - 1));
+    double frac = (position * (numPositions - 1)) - index;
+
+    double gamma = gammas[index] * (1 - frac) + gammas[index + 1] * frac;
+    double f0 = f0s[index] * (1 - frac) + f0s[index + 1] * frac;
+    double Q = Qs[index] * (1 - frac) + Qs[index + 1] * frac;
+
+    // Convert these parameters to filter coefficients
+    double w0 = 2 * M_PI * f0 / getSampleRate();
+    
+    //
+    //               gamma*s/w0
+    // H(s) = __________________________
+    //         s^2/w0^2 + s/(w0*Q) + 1
+    //
+
+    b0 = 0;
+    b1 = gamma/w0;
+    b2 = 0;
+    a0 = 1/(w0*w0);
+    a1 = 1/(w0*Q);
+    a2 = 1;
+
     wahFilter.b[0]=b2; wahFilter.b[1]=b1; wahFilter.b[2]=b0;
     wahFilter.a[0]=a2; wahFilter.a[1]=a1; wahFilter.a[2]=a0;
     double fs = getSampleRate();
